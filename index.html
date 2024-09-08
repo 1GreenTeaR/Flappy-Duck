@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlappyDuck</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            background-color: black;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        canvas{
+            background-color: #70c5cd;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+       const canvas = document.getElementById("canvas");
+       const c = canvas.getContext('2d');
+
+       c.canvas.width = 300;
+       c.canvas.height = 600;
+
+       c.fillStyle = 'red';
+       c.fillRect(0,0,10,10);
+    </script>
+</body>
+</html>
