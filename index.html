@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FlappyDuck</title>
     <style>
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
         }
@@ -20,22 +22,45 @@
             align-items: center;
             min-height: 100vh;
         }
-        canvas{
+
+        #canvas {
             background-color: #70c5cd;
         }
     </style>
 </head>
+
 <body>
     <canvas id="canvas"></canvas>
     <script>
-       const canvas = document.getElementById("canvas");
-       const c = canvas.getContext('2d');
+        const canvas = document.getElementById("canvas");
+        const c = canvas.getContext("2d");
 
-       c.canvas.width = 300;
-       c.canvas.height = 600;
+        const state = { scale: 1 }
 
-       c.fillStyle = 'red';
-       c.fillRect(0,0,10,10);
+        function setScale() {
+            state.scale = window.devicePixelRatio;
+
+            let scaleOuter = Math.min(window.innerWidth / 400, window.innerHeight / 600);
+
+            canvas.style.width = `${400 * scaleOuter}px`;
+            canvas.style.height = `${600 * scaleOuter}px`;
+            
+            c.canvas.width = 400 * state.scale;
+            c.canvas.height = 600 * state.scale;
+
+            c.fillRect(0, 0, 10, 10);
+        }
+
+        setScale();
+
+
+
+        c.fillStyle = "red";
+        c.fillRect(0, 0, 10, 10);
+
+
+        window.addEventListener('resize', setScale);
     </script>
 </body>
+
 </html>
