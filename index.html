@@ -1,66 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FlappyDuck</title>
     <style>
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-        }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
 
-        html {
-            background-color: black;
-        }
+      html {
+        background-color: black;
+      }
 
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        overflow: hidden;
+      }
 
-        #canvas {
-            background-color: #70c5cd;
-        }
+      #canvas {
+        background-color: #70c5cd;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <canvas id="canvas"></canvas>
     <script>
-        const canvas = document.getElementById("canvas");
-        const c = canvas.getContext("2d");
+      const canvas = document.getElementById("canvas");
+      const c = canvas.getContext("2d");
 
-        const state = { scale: 1 }
+      const state = {
+        scale: 1,
+        width: 400,
+        height: 600,
+        // TODO needs better name
+        updateData: {
+          ticksPerSecond: 120,
+          tickDurationMs: 1000 / 120,
+          lastUpdate: undefined,
+        },
+        input: { up: false, lastUpTime: window.performance.now() },
+        player: {
+          y: 0.5,
+          velocity: 0,
+        },
+      };
 
-        function setScale() {
-            state.scale = window.devicePixelRatio;
+      function setScale() {
+        state.scale = window.devicePixelRatio;
 
-            let scaleOuter = Math.min(window.innerWidth / 400, window.innerHeight / 600);
+        let scaleOuter = Math.min(
+          window.innerWidth / state.width,
+          window.innerHeight / state.height
+        );
 
-            canvas.style.width = `${400 * scaleOuter}px`;
-            canvas.style.height = `${600 * scaleOuter}px`;
-            
-            c.canvas.width = 400 * state.scale;
-            c.canvas.height = 600 * state.scale;
+        // canvas.style.width = `${Math.floor(400 * scaleOuter)}px`;
+        // canvas.style.height = `${Math.floor(600 * scaleOuter)}px`;
 
-            c.fillRect(0, 0, 10, 10);
-        }
+        canvas.style.width = `${state.width * scaleOuter}px`;
+        canvas.style.height = `${state.height * scaleOuter}px`;
 
-        setScale();
+        state.width = state.width * state.scale * scaleOuter;
+        state.height = state.height * state.scale * scaleOuter;
 
+        c.canvas.width = state.width;
+        c.canvas.height = state.height;
 
+        console.log(
+          "Setting style size ",
+          canvas.style.width,
+          " x ",
+          canvas.style.height
+        );
+        console.log(
+          "Setting canvas size ",
+          c.canvas.width,
+          " x ",
+          c.canvas.height
+        );
+      }
 
+      function render() {
+        c.fillStyle = "blue";
+        c.clearRect(0, 0, c.canvas.width, c.canvas.height);
         c.fillStyle = "red";
-        c.fillRect(0, 0, 10, 10);
+        c.beginPath();
+        const birdSize = state.width * 0.07;
+        c.arc(
+          state.width / 2 - birdSize,
+          state.player.y * state.height,
+          birdSize,
+          0,
+          2 * Math.PI
+        );
+        c.fill();
+      }
 
+      function update() {
+        if (state.updateData.lastUpdate === undefined)
+          state.updateData.lastUpdate = window.performance.now();
+        const delta = window.performance.now() - state.updateData.lastUpdate;
+        const updatesAmount = Math.floor(
+          delta / state.updateData.tickDurationMs
+        );
+        state.updateData.lastUpdate +=
+          state.updateData.tickDurationMs * updatesAmount;
 
-        window.addEventListener('resize', setScale);
+        for (let i = 0; i < updatesAmount; i++) {
+          state.player.velocity += 0.0002;
+          state.player.y += state.player.velocity;
+          if (state.input.up === true) {
+            state.player.velocity = -0.008;
+            state.input.up = false;
+          }
+
+          // if (state.input.down === true) state.player.y = state.player.y + 1;
+        }
+      }
+
+      function start() {
+        update();
+        render();
+        window.requestAnimationFrame(start);
+      }
+
+      setScale();
+      start();
+
+      window.addEventListener("resize", () => {
+        setScale();
+        render();
+      });
+
+      window.addEventListener("keydown", (e) => {
+        console.log(e);
+        if (e.repeat) return;
+        if (
+          e.code === "Space" &&
+          window.performance.now() > state.input.lastUpTime + 5
+        ) {
+          state.input.lastUpTime = window.performance.now();
+          state.input.up = true;
+        }
+      });
+
+      // window.addEventListener("keyup", (e) => {
+      //   console.log(e);
+      //   if (e.repeat) return;
+      //   if (e.code === "Space") {
+      //     state.input.up = false;
+      //     state.input.jumped = false;
+      //   }
+      // });
     </script>
-</body>
-
+  </body>
 </html>
