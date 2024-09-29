@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FlappyDuck</title>
+    <script type="text/javascript" src="/obstacle.js"></script>
     <style>
       html,
       body {
@@ -49,16 +50,19 @@
         player: {
           y: 0.5,
           velocity: 0,
+          distance: 0,
         },
       };
 
-      function setScale() {
-        state.scale = window.devicePixelRatio;
+      const tube = new Obstacle(0.5);
 
+      function setScale() {
         let scaleOuter = Math.min(
           window.innerWidth / state.width,
           window.innerHeight / state.height
         );
+
+        state.scale = window.devicePixelRatio * scaleOuter;
 
         // canvas.style.width = `${Math.floor(400 * scaleOuter)}px`;
         // canvas.style.height = `${Math.floor(600 * scaleOuter)}px`;
@@ -66,8 +70,8 @@
         canvas.style.width = `${state.width * scaleOuter}px`;
         canvas.style.height = `${state.height * scaleOuter}px`;
 
-        state.width = state.width * state.scale * scaleOuter;
-        state.height = state.height * state.scale * scaleOuter;
+        state.width = state.width * state.scale;
+        state.height = state.height * state.scale;
 
         c.canvas.width = state.width;
         c.canvas.height = state.height;
@@ -91,15 +95,17 @@
         c.clearRect(0, 0, c.canvas.width, c.canvas.height);
         c.fillStyle = "red";
         c.beginPath();
-        const birdSize = state.width * 0.07;
+        const birdSize = 50 * state.scale;
         c.arc(
           state.width / 2 - birdSize,
           state.player.y * state.height,
-          birdSize,
+          birdSize / 2,
           0,
           2 * Math.PI
         );
         c.fill();
+
+        tube.render();
       }
 
       function update() {
@@ -113,6 +119,8 @@
           state.updateData.tickDurationMs * updatesAmount;
 
         for (let i = 0; i < updatesAmount; i++) {
+          tube.update();
+          state.player.distance++;
           state.player.velocity += 0.0002;
           state.player.y += state.player.velocity;
           if (state.input.up === true) {

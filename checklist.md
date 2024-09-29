@@ -3,15 +3,15 @@
 ## Logic
 
 +- Game loop
++- Input detection
 +- Bird flaying
++- Obstacles logic
 
+- World scrolling
 - Collison detection
 - Score
-- Obstacles logic
-- World scrolling
 - Retry
 - End screen
-  +- Input detection
 - Leaderboard
 
 ## Visuals & Sound
