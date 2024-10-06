@@ -1,171 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FlappyDuck</title>
-    <script type="text/javascript" src="/obstacle.js"></script>
-    <style>
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-      }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>FlappyDuck</title>
+        <script type="text/javascript" src="/obstacle.js"></script>
+        <script type="text/javascript" src="/player.js"></script>
+        <style>
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+            }
 
-      html {
-        background-color: black;
-      }
+            html {
+                background-color: black;
+            }
 
-      body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        overflow: hidden;
-      }
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                overflow: hidden;
+            }
 
-      #canvas {
-        background-color: #70c5cd;
-      }
-    </style>
-  </head>
+            #canvas {
+                background-color: #70c5cd;
+            }
+        </style>
+    </head>
 
-  <body>
-    <canvas id="canvas"></canvas>
-    <script>
-      const canvas = document.getElementById("canvas");
-      const c = canvas.getContext("2d");
+    <body>
+        <canvas id="canvas"></canvas>
+        <script>
+            const canvas = document.getElementById('canvas');
+            const c = canvas.getContext('2d');
 
-      const state = {
-        scale: 1,
-        width: 400,
-        height: 600,
-        // TODO needs better name
-        updateData: {
-          ticksPerSecond: 120,
-          tickDurationMs: 1000 / 120,
-          lastUpdate: undefined,
-        },
-        input: { up: false, lastUpTime: window.performance.now() },
-        player: {
-          y: 0.5,
-          velocity: 0,
-          distance: 0,
-        },
-      };
+            const config = {
+                width: 400,
+                height: 600,
+                scale: 1,
+            };
 
-      const tube = new Obstacle(0.5);
+            const state = {
+                scale: undefined,
+                width: undefined,
+                height: undefined,
+                // TODO needs better name
+                updateData: {
+                    ticksPerSecond: 120,
+                    tickDurationMs: 1000 / 120,
+                    lastUpdate: undefined,
+                    ticks: 0,
+                },
+                input: { up: false, lastUpTime: window.performance.now() },
+            };
 
-      function setScale() {
-        let scaleOuter = Math.min(
-          window.innerWidth / state.width,
-          window.innerHeight / state.height
-        );
+            const tubes = [];
+            const player = new Player();
 
-        state.scale = window.devicePixelRatio * scaleOuter;
+            function setScale() {
+                let scaleOuter = Math.min(
+                    window.innerWidth / config.width,
+                    window.innerHeight / config.height
+                );
 
-        // canvas.style.width = `${Math.floor(400 * scaleOuter)}px`;
-        // canvas.style.height = `${Math.floor(600 * scaleOuter)}px`;
+                state.scale = window.devicePixelRatio * scaleOuter * config.scale;
 
-        canvas.style.width = `${state.width * scaleOuter}px`;
-        canvas.style.height = `${state.height * scaleOuter}px`;
+                // canvas.style.width = `${Math.floor(400 * scaleOuter)}px`;
+                // canvas.style.height = `${Math.floor(600 * scaleOuter)}px`;
 
-        state.width = state.width * state.scale;
-        state.height = state.height * state.scale;
+                canvas.style.width = `${config.width * scaleOuter}px`;
+                canvas.style.height = `${config.height * scaleOuter}px`;
 
-        c.canvas.width = state.width;
-        c.canvas.height = state.height;
+                state.width = config.width * state.scale;
+                state.height = config.height * state.scale;
 
-        console.log(
-          "Setting style size ",
-          canvas.style.width,
-          " x ",
-          canvas.style.height
-        );
-        console.log(
-          "Setting canvas size ",
-          c.canvas.width,
-          " x ",
-          c.canvas.height
-        );
-      }
+                c.canvas.width = state.width;
+                c.canvas.height = state.height;
 
-      function render() {
-        c.fillStyle = "blue";
-        c.clearRect(0, 0, c.canvas.width, c.canvas.height);
-        c.fillStyle = "red";
-        c.beginPath();
-        const birdSize = 50 * state.scale;
-        c.arc(
-          state.width / 2 - birdSize,
-          state.player.y * state.height,
-          birdSize / 2,
-          0,
-          2 * Math.PI
-        );
-        c.fill();
+                console.log('Setting style size ', canvas.style.width, ' x ', canvas.style.height);
+                console.log('Setting canvas size ', c.canvas.width, ' x ', c.canvas.height);
+            }
 
-        tube.render();
-      }
+            function render() {
+                c.fillStyle = 'blue';
+                c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+                c.fillStyle = 'red';
 
-      function update() {
-        if (state.updateData.lastUpdate === undefined)
-          state.updateData.lastUpdate = window.performance.now();
-        const delta = window.performance.now() - state.updateData.lastUpdate;
-        const updatesAmount = Math.floor(
-          delta / state.updateData.tickDurationMs
-        );
-        state.updateData.lastUpdate +=
-          state.updateData.tickDurationMs * updatesAmount;
+                tubes.forEach((tube) => {
+                    tube.render();
+                });
+                player.render();
+            }
 
-        for (let i = 0; i < updatesAmount; i++) {
-          tube.update();
-          state.player.distance++;
-          state.player.velocity += 0.0002;
-          state.player.y += state.player.velocity;
-          if (state.input.up === true) {
-            state.player.velocity = -0.008;
-            state.input.up = false;
-          }
+            function update() {
+                if (state.updateData.lastUpdate === undefined)
+                    state.updateData.lastUpdate = window.performance.now();
+                const delta = window.performance.now() - state.updateData.lastUpdate;
+                const updatesAmount = Math.floor(delta / state.updateData.tickDurationMs);
+                state.updateData.lastUpdate += state.updateData.tickDurationMs * updatesAmount;
 
-          // if (state.input.down === true) state.player.y = state.player.y + 1;
-        }
-      }
+                for (let i = 0; i < updatesAmount; i++) {
+                    tubes.forEach((tube) => {
+                        tube.update();
+                    });
+                    player.update();
 
-      function start() {
-        update();
-        render();
-        window.requestAnimationFrame(start);
-      }
+                    // if (state.input.down === true) state.player.y = state.player.y + 1;
 
-      setScale();
-      start();
+                    if (state.updateData.ticks % (state.updateData.ticksPerSecond * 4) === 0) {
+                        tubes.push(new Obstacle(1 + 50 / config.width / 2, Math.random()));
+                    }
 
-      window.addEventListener("resize", () => {
-        setScale();
-        render();
-      });
+                    state.updateData.ticks++;
+                }
+            }
 
-      window.addEventListener("keydown", (e) => {
-        console.log(e);
-        if (e.repeat) return;
-        if (
-          e.code === "Space" &&
-          window.performance.now() > state.input.lastUpTime + 5
-        ) {
-          state.input.lastUpTime = window.performance.now();
-          state.input.up = true;
-        }
-      });
+            function start() {
+                update();
+                render();
+                window.requestAnimationFrame(start);
+            }
 
-      // window.addEventListener("keyup", (e) => {
-      //   console.log(e);
-      //   if (e.repeat) return;
-      //   if (e.code === "Space") {
-      //     state.input.up = false;
-      //     state.input.jumped = false;
-      //   }
-      // });
-    </script>
-  </body>
+            setScale();
+            start();
+
+            window.addEventListener('resize', () => {
+                setScale();
+                render();
+            });
+
+            window.addEventListener('keydown', (e) => {
+                console.log(e);
+                if (e.repeat) return;
+                if (e.code === 'Space' && window.performance.now() > state.input.lastUpTime + 5) {
+                    state.input.lastUpTime = window.performance.now();
+                    state.input.up = true;
+                }
+            });
+
+            // window.addEventListener("keyup", (e) => {
+            //   console.log(e);
+            //   if (e.repeat) return;
+            //   if (e.code === "Space") {
+            //     state.input.up = false;
+            //     state.input.jumped = false;
+            //   }
+            // });
+        </script>
+    </body>
 </html>

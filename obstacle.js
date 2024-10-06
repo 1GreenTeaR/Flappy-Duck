@@ -4,13 +4,13 @@ class Obstacle {
     pos;
     holeY;
 
-    constructor(pos) {
+    constructor(pos = 0.5, holeY = 0.5) {
         this.pos = pos;
-        this.holeY = 0.5;
+        this.holeY = holeY;
     }
     
     update() {
-        this.pos -= 0.001;
+        this.pos -= 0.0015;
     }
 
     render() {
@@ -21,14 +21,21 @@ class Obstacle {
             (state.width * this.pos) - obstacleWidth * 0.5,
             0,
             obstacleWidth,
-            (state.height * this.holeY) - (holeSize / 2)
+            holeSize / 2 + ((state.height - holeSize) * this.holeY) - (holeSize / 2)
           );
 
-        c.fillRect(
+          c.fillRect(
             (state.width * this.pos) - obstacleWidth * 0.5,
-            (state.height * this.holeY) + (holeSize / 2),
+            holeSize / 2 + ((state.height - holeSize) * this.holeY) + (holeSize / 2),
             obstacleWidth,
-            state.height - ((state.height * this.holeY) + (holeSize / 2))
+            state.height - (holeSize / 2 + ((state.height - holeSize) * this.holeY) + (holeSize / 2))
+          );
+
+          c.fillRect(
+            (state.width * this.pos) - 5,
+            holeSize / 2 + ((state.height - holeSize) * this.holeY) - 5,
+            10,
+            10
           );
 
 

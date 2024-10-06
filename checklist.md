@@ -6,20 +6,20 @@
 +- Input detection
 +- Bird flaying
 +- Obstacles logic
++- World scrolling
 
-- World scrolling
-- Collison detection
-- Score
-- Retry
-- End screen
-- Leaderboard
+-   Collison detection
+-   Retry
+-   Score
+-   End screen
+-   Leaderboard
 
 ## Visuals & Sound
 
-- Assets
-- Bird rotation
-- Background scrolling
-- HUD
-- Sound effects
-- Vibration
-- Experiment ???
+-   Assets
+-   Bird rotation
+-   Background scrolling
+-   HUD
+-   Sound effects
+-   Vibration
+-   Experiment ???
