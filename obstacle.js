@@ -6,6 +6,7 @@ class Obstacle {
     x;
     y;
 
+    isPassed = false;
     constructor(pos = 0.5, holeY = 0.5) {
         this.x = pos;
         this.y = holeY;
@@ -14,6 +15,17 @@ class Obstacle {
     update() {
         this.x -= 0.0015;
         this.collision();
+
+        const e1 = player;
+        const e2 = this;
+
+        if (
+            !this.isPassed &&
+            e1.x * config.width > e2.x * config.width + this.size / 2 + e1.size / 2
+        ) {
+            e1.points++;
+            this.isPassed = true;
+        }
     }
 
     collision() {
@@ -29,14 +41,16 @@ class Obstacle {
                 y: (config.height - (this.offsetTop + this.offsetBottom)) * this.y + this.offsetTop,
             };
 
+            if (e1Pos.y < e2Pos.y - this.holeSize / 2 || e1Pos.y > e2Pos.y + this.holeSize / 2) {
+                return true;
+            }
+
             const points = [
                 { x: e2Pos.x - this.size / 2, y: e2Pos.y - this.holeSize / 2 },
                 { x: e2Pos.x + this.size / 2, y: e2Pos.y - this.holeSize / 2 },
                 { x: e2Pos.x + this.size / 2, y: e2Pos.y + this.holeSize / 2 },
                 { x: e2Pos.x - this.size / 2, y: e2Pos.y + this.holeSize / 2 },
             ];
-
-            console.log(e2Pos, points);
 
             for (let i = 0; i < points.length; i++) {
                 if (
@@ -45,6 +59,11 @@ class Obstacle {
                 ) {
                     return true;
                 }
+            }
+
+            if (distanceX < e2.size / 2) {
+                if (e2Pos.y - this.holeSize / 2 + e1.size / 2 > e1Pos.y) return true;
+                if (e2Pos.y + this.holeSize / 2 - e1.size / 2 < e1Pos.y) return true;
             }
         }
     }

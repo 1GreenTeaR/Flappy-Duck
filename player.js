@@ -4,6 +4,7 @@ class Player {
     x;
     y;
     distance = 0;
+    points = 0;
     velocity = 0;
 
     constructor() {

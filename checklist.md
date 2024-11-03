@@ -8,9 +8,10 @@
 +- Obstacles logic
 +- World scrolling
 
--   Collison detection
++- Collison detection
+
 -   Retry
--   Score
+    +- Score
 -   End screen
 -   Leaderboard
 
