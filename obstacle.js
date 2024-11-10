@@ -13,10 +13,13 @@ class Obstacle {
     }
 
     update() {
+        if (state.levelData.player.isAlive === false) return;
         this.x -= 0.0015;
-        this.collision();
+        if (this.collision()) {
+            state.levelData.player.isAlive = false;
+        }
 
-        const e1 = player;
+        const e1 = state.levelData.player;
         const e2 = this;
 
         if (
@@ -29,7 +32,7 @@ class Obstacle {
     }
 
     collision() {
-        const e1 = player;
+        const e1 = state.levelData.player;
         const e2 = this;
 
         const distanceX = Math.abs(e1.x - e2.x) * config.width;
@@ -54,7 +57,7 @@ class Obstacle {
 
             for (let i = 0; i < points.length; i++) {
                 if (
-                    player.size / 2 >
+                    state.levelData.player.size / 2 >
                     ((points[i].x - e1Pos.x) ** 2 + (points[i].y - e1Pos.y) ** 2) ** 0.5
                 ) {
                     return true;
@@ -66,6 +69,8 @@ class Obstacle {
                 if (e2Pos.y + this.holeSize / 2 - e1.size / 2 < e1Pos.y) return true;
             }
         }
+
+        return false;
     }
 
     render() {

@@ -6,6 +6,7 @@ class Player {
     distance = 0;
     points = 0;
     velocity = 0;
+    isAlive = true;
 
     constructor() {
         this.speed = 0.0002;
@@ -15,16 +16,20 @@ class Player {
     }
 
     update() {
-        this.distance++;
+        if (this.isAlive) {
+            this.distance++;
+            if (state.input.up === true) {
+                this.velocity = -0.008;
+                state.input.up = false;
+            }
+        }
+
         this.velocity += this.speed;
         this.y += this.velocity;
-        if (state.input.up === true) {
-            this.velocity = -0.008;
-            state.input.up = false;
-        }
     }
 
     render() {
+        c.fillStyle = 'blue';
         c.beginPath();
         const birdSize = this.size * state.scale;
         c.arc(state.width * this.x, this.y * state.height, birdSize / 2, 0, 2 * Math.PI);

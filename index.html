@@ -28,11 +28,49 @@
             #canvas {
                 background-color: #70c5cd;
             }
+
+            .dev-panel {
+                position: fixed;
+                top: 0;
+                right: 0;
+            }
+
+            .dev-button {
+                color: white;
+                padding: 10px 20px;
+                background-color: green;
+                border-radius: 20px;
+                user-select: none;
+                cursor: pointer;
+            }
+
+            .game-container {
+                position: relative;
+            }
+
+            .end-game-container {
+                background-color: gray;
+                padding: 20px;
+                border-radius: 20px;
+
+                position: absolute;
+                top: 50%;
+                left: 50%;
+
+                transform: translate(-50%, -50%);
+            }
         </style>
     </head>
 
     <body>
-        <canvas id="canvas"></canvas>
+        <div class="game-container">
+            <canvas id="canvas"></canvas>
+            <div class="end-game-container">test</div>
+        </div>
+        <div class="dev-panel">
+            <div class="dev-button" tabindex="-1" onclick="start()">restart</div>
+        </div>
+
         <script>
             const canvas = document.getElementById('canvas');
             const c = canvas.getContext('2d');
@@ -55,6 +93,12 @@
                     lastUpdate: undefined,
                     ticks: 0,
                 },
+                levelData: {
+                    isRunning: false,
+                    tubes: undefined,
+                    player: undefined,
+                    startTick: undefined,
+                },
                 input: { up: false, lastUpTime: window.performance.now() },
                 debug: {
                     x: 0,
@@ -63,9 +107,6 @@
                     offsetY: 0,
                 },
             };
-
-            const tubes = [];
-            const player = new Player();
 
             function setScale() {
                 let scaleOuter = Math.min(
@@ -100,12 +141,14 @@
                 c.clearRect(0, 0, c.canvas.width, c.canvas.height);
                 c.fillStyle = 'red';
 
-                tubes.forEach((tube) => {
-                    tube.render();
-                });
-                player.render();
+                if (state.levelData.isRunning) {
+                    state.levelData.tubes.forEach((tube) => {
+                        tube.render();
+                    });
+                    state.levelData.player.render();
 
-                c.fillText('Points: ' + player.points, 10, 10);
+                    c.fillText('Points: ' + state.levelData.player.points, 10, 10);
+                }
             }
 
             function update() {
@@ -116,34 +159,66 @@
                 state.updateData.lastUpdate += state.updateData.tickDurationMs * updatesAmount;
 
                 for (let i = 0; i < updatesAmount; i++) {
-                    tubes.forEach((tube) => {
-                        tube.update();
-                    });
-                    player.update();
-                    if (config.debug) {
-                        player.velocity = 0;
-                        player.x = (state.debug.x - state.debug.offsetX) / state.width;
-                        player.y = (state.debug.y - state.debug.offsetY) / state.height;
-                    }
+                    if (state.levelData.isRunning) {
+                        state.levelData.tubes.forEach((tube) => {
+                            tube.update();
+                        });
+                        state.levelData.player.update();
+                        if (config.debug) {
+                            state.levelData.player.velocity = 0;
+                            state.levelData.player.x =
+                                (state.debug.x - state.debug.offsetX) / state.width;
+                            state.levelData.player.y =
+                                (state.debug.y - state.debug.offsetY) / state.height;
+                        }
 
-                    // if (state.input.down === true) state.player.y = state.player.y + 1;
+                        // if (state.input.down === true) state.player.y = state.player.y + 1;
 
-                    if (state.updateData.ticks % (state.updateData.ticksPerSecond * 4) === 0) {
-                        tubes.push(new Obstacle(1 + 50 / config.width / 2, Math.random()));
+                        if (
+                            (state.updateData.ticks - state.levelData.startTick) %
+                                (state.updateData.ticksPerSecond * 4) ===
+                            0
+                        ) {
+                            state.levelData.tubes.push(
+                                new Obstacle(1 + 50 / config.width / 2, Math.random())
+                            );
+                        }
                     }
 
                     state.updateData.ticks++;
                 }
             }
 
+            function end() {}
+
             function start() {
-                update();
-                render();
-                window.requestAnimationFrame(start);
+                // levelData: {
+                //     tubes: [],
+                //     player: new Player(),
+                // },
+
+                state.levelData = {
+                    isRunning: true,
+                    tubes: [],
+                    player: new Player(),
+                    startTick: state.updateData.ticks,
+                };
+
+                console.log('start');
+            }
+
+            function run() {
+                start();
+                const cycle = () => {
+                    update();
+                    render();
+                    window.requestAnimationFrame(cycle);
+                };
+                cycle();
             }
 
             setScale();
-            start();
+            run();
 
             window.addEventListener('resize', () => {
                 setScale();
@@ -167,14 +242,13 @@
                 }
             });
 
-            // window.addEventListener("keyup", (e) => {
-            //   console.log(e);
-            //   if (e.repeat) return;
-            //   if (e.code === "Space") {
-            //     state.input.up = false;
-            //     state.input.jumped = false;
-            //   }
-            // });
+            window.addEventListener('keyup', (e) => {
+                console.log(e);
+                if (e.repeat) return;
+                if (e.code === 'Space') {
+                    state.input.up = false;
+                }
+            });
         </script>
     </body>
 </html>

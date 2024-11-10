@@ -10,8 +10,9 @@
 
 +- Collison detection
 
--   Retry
-    +- Score
++- Retry
++- Score
+
 -   End screen
 -   Leaderboard
 
