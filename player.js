@@ -7,6 +7,8 @@ class Player {
     points = 0;
     velocity = 0;
     isAlive = true;
+    hp = 1;
+    maxHp = 1;
 
     constructor() {
         this.speed = 0.0002;
@@ -26,6 +28,15 @@ class Player {
 
         this.velocity += this.speed;
         this.y += this.velocity;
+    }
+
+    damage(amount) {
+        if (!this.isAlive) return;
+        this.hp -= amount;
+        if (this.hp <= 0) {
+            this.isAlive = false;
+            end();
+        }
     }
 
     render() {

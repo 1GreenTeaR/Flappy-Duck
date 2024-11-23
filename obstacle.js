@@ -16,7 +16,8 @@ class Obstacle {
         if (state.levelData.player.isAlive === false) return;
         this.x -= 0.0015;
         if (this.collision()) {
-            state.levelData.player.isAlive = false;
+            // state.levelData.player.isAlive = false;
+            state.levelData.player.damage(1);
         }
 
         const e1 = state.levelData.player;

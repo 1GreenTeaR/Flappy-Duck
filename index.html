@@ -59,13 +59,22 @@
 
                 transform: translate(-50%, -50%);
             }
+
+            #end-game-container {
+                display: none;
+            }
         </style>
     </head>
 
     <body>
         <div class="game-container">
             <canvas id="canvas"></canvas>
-            <div class="end-game-container">test</div>
+            <div id="end-game-container" class="end-game-container">
+                <div>Game Over</div>
+                <div id="end-game-score">-</div>
+                <div id="end-game-leaderboard"></div>
+                <button onclick="start()">Restart</div>
+            </div>
         </div>
         <div class="dev-panel">
             <div class="dev-button" tabindex="-1" onclick="start()">restart</div>
@@ -74,6 +83,7 @@
         <script>
             const canvas = document.getElementById('canvas');
             const c = canvas.getContext('2d');
+            const leaderboard = localStorage.getItem("leaderboard") ?? [];
 
             const config = {
                 width: 400,
@@ -164,6 +174,7 @@
                             tube.update();
                         });
                         state.levelData.player.update();
+
                         if (config.debug) {
                             state.levelData.player.velocity = 0;
                             state.levelData.player.x =
@@ -189,13 +200,30 @@
                 }
             }
 
-            function end() {}
+            function end() {
+                const endGameContainerElement = document.getElementById('end-game-container');
+                const endGameScore = document.getElementById("end-game-score")
+                const endGameLeaderboard = document.getElementById("end-game-leaderboard")
+                endGameContainerElement.style.display = 'block';
+                endGameScore.innerHTML = state.levelData.player.points;
+
+                leaderboard.push({score: state.levelData.player.points, date: Date.now()});
+
+                const button = document.createElement('button');
+                button.innerText = 'test1'
+                function getHTMLLayoutFOrLeaderboardENtry(score, date) {
+                    return `<div>${score}</div>`
+                }
+                // endGameLeaderboard.innerHTML = leaderboar.map((entry) => getHTMLLayoutFOrLeaderboardENtry(entry.score, entry.date)).join('')
+            }
 
             function start() {
                 // levelData: {
                 //     tubes: [],
                 //     player: new Player(),
                 // },
+                const endGameContainerElement = document.getElementById('end-game-container');
+                endGameContainerElement.style.display = 'none';
 
                 state.levelData = {
                     isRunning: true,
