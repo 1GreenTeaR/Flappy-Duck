@@ -1,6 +1,6 @@
 class Obstacle {
     size = 50;
-    holeSize = 150;
+    holeSize = 250;
     offsetTop = 75;
     offsetBottom = 75;
     x;
@@ -14,7 +14,7 @@ class Obstacle {
 
     update() {
         if (state.levelData.player.isAlive === false) return;
-        this.x -= 0.0015;
+        this.x -= 0.0025;
         if (this.collision()) {
             // state.levelData.player.isAlive = false;
             state.levelData.player.damage(1);

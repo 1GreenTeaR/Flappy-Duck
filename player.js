@@ -15,6 +15,16 @@ class Player {
         this.size = 50;
         this.y = 0.5;
         this.x = 0.5 - this.size / config.width / 2;
+
+        const image = fetch('assets/bird.png').then(async (data) => {
+            let img = new Image();
+            img.onload = () => {
+                this.image = img;
+            };
+            img.src = URL.createObjectURL(await data.blob());
+        });
+
+        console.log(123);
     }
 
     update() {
@@ -40,10 +50,22 @@ class Player {
     }
 
     render() {
-        c.fillStyle = 'blue';
-        c.beginPath();
         const birdSize = this.size * state.scale;
-        c.arc(state.width * this.x, this.y * state.height, birdSize / 2, 0, 2 * Math.PI);
-        c.fill();
+        if (this.image) {
+            c.imageSmoothingEnabled = false;
+            c.drawImage(
+                this.image,
+                state.width * this.x,
+                this.y * state.height,
+                birdSize,
+                birdSize
+            );
+        } else {
+            c.fillStyle = 'blue';
+            c.beginPath();
+
+            c.arc(state.width * this.x, this.y * state.height, birdSize / 2, 0, 2 * Math.PI);
+            c.fill();
+        }
     }
 }

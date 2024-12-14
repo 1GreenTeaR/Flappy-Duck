@@ -13,14 +13,16 @@
 +- Retry
 +- Score
 
--   End screen
--   Leaderboard
++- End screen
++- Leaderboard
 
 ## Visuals & Sound
 
--   Assets
++- Assets
+
 -   Bird rotation
 -   Background scrolling
+-   Clouds
 -   HUD
 -   Sound effects
 -   Vibration

@@ -63,6 +63,10 @@
             #end-game-container {
                 display: none;
             }
+
+            #end-game-congrats {
+                display: none;
+            }
         </style>
     </head>
 
@@ -71,9 +75,10 @@
             <canvas id="canvas"></canvas>
             <div id="end-game-container" class="end-game-container">
                 <div>Game Over</div>
+                <div id="end-game-congrats">New Highscore!</div>
+                <div id="end-game-best-score">-</div>
                 <div id="end-game-score">-</div>
-                <div id="end-game-leaderboard"></div>
-                <button onclick="start()">Restart</div>
+                <button onclick="start()">Restart</button>
             </div>
         </div>
         <div class="dev-panel">
@@ -82,8 +87,8 @@
 
         <script>
             const canvas = document.getElementById('canvas');
-            const c = canvas.getContext('2d');
-            const leaderboard = localStorage.getItem("leaderboard") ?? [];
+            const c = canvas.getContext('2d', { alpha: false });
+            let bestScore = Number(localStorage.getItem('best-score') ?? 0);
 
             const config = {
                 width: 400,
@@ -147,8 +152,8 @@
             }
 
             function render() {
-                c.fillStyle = 'blue';
-                c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+                c.fillStyle = '#70c5cd';
+                c.fillRect(0, 0, c.canvas.width, c.canvas.height);
                 c.fillStyle = 'red';
 
                 if (state.levelData.isRunning) {
@@ -202,19 +207,18 @@
 
             function end() {
                 const endGameContainerElement = document.getElementById('end-game-container');
-                const endGameScore = document.getElementById("end-game-score")
-                const endGameLeaderboard = document.getElementById("end-game-leaderboard")
+                const endGameScore = document.getElementById('end-game-score');
+                const endGameBestScore = document.getElementById('end-game-best-score');
+                const endGameCongrats = document.getElementById('end-game-congrats');
                 endGameContainerElement.style.display = 'block';
                 endGameScore.innerHTML = state.levelData.player.points;
 
-                leaderboard.push({score: state.levelData.player.points, date: Date.now()});
-
-                const button = document.createElement('button');
-                button.innerText = 'test1'
-                function getHTMLLayoutFOrLeaderboardENtry(score, date) {
-                    return `<div>${score}</div>`
-                }
-                // endGameLeaderboard.innerHTML = leaderboar.map((entry) => getHTMLLayoutFOrLeaderboardENtry(entry.score, entry.date)).join('')
+                if (bestScore < state.levelData.player.points) {
+                    bestScore = state.levelData.player.points;
+                    localStorage.setItem('best-score', bestScore);
+                    endGameCongrats.style.display = 'block';
+                } else endGameCongrats.style.display = 'none';
+                endGameBestScore.innerHTML = bestScore;
             }
 
             function start() {
@@ -262,7 +266,6 @@
             }
 
             window.addEventListener('keydown', (e) => {
-                console.log(e);
                 if (e.repeat) return;
                 if (e.code === 'Space' && window.performance.now() > state.input.lastUpTime + 5) {
                     state.input.lastUpTime = window.performance.now();
@@ -271,11 +274,14 @@
             });
 
             window.addEventListener('keyup', (e) => {
-                console.log(e);
                 if (e.repeat) return;
                 if (e.code === 'Space') {
                     state.input.up = false;
                 }
+            });
+
+            window.addEventListener('mousedown', (e) => {
+                state.input.up = true;
             });
         </script>
     </body>
