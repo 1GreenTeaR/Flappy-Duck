@@ -55,8 +55,8 @@ class Player {
             c.imageSmoothingEnabled = false;
             c.drawImage(
                 this.image,
-                state.width * this.x,
-                this.y * state.height,
+                state.width * this.x - birdSize / 2,
+                this.y * state.height - birdSize / 2,
                 birdSize,
                 birdSize
             );
