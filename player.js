@@ -9,6 +9,7 @@ class Player {
     isAlive = true;
     hp = 1;
     maxHp = 1;
+    temp = 0;
 
     constructor() {
         this.speed = 0.0002;
@@ -20,6 +21,22 @@ class Player {
             let img = new Image();
             img.onload = () => {
                 this.image = img;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = this.size * 3;
+                canvas.height = this.size * 3;
+                const ctx = canvas.getContext('2d');
+
+                ctx.imageSmoothingEnabled = false;
+                ctx.webkitImageSmoothingEnabled = false;
+                ctx.mozImageSmoothingEnabled = false;
+
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                this.canvas = canvas;
+
+                ctx.imageSmoothingEnabled = true;
+                ctx.webkitImageSmoothingEnabled = true;
+                ctx.mozImageSmoothingEnabled = true;
             };
             img.src = URL.createObjectURL(await data.blob());
         });
@@ -50,15 +67,27 @@ class Player {
     }
 
     render() {
+        const degrees = this.velocity * 20 * Math.PI;
+        function draw(c, image, x, y, width, height, degrees) {
+            c.save();
+            c.translate(x, y);
+            c.rotate(degrees);
+            c.drawImage(image, -width / 2, -height / 2, width, height);
+
+            c.restore();
+        }
+
         const birdSize = this.size * state.scale;
-        if (this.image) {
+        if (this.canvas) {
             c.imageSmoothingEnabled = false;
-            c.drawImage(
-                this.image,
-                state.width * this.x - birdSize / 2,
-                this.y * state.height - birdSize / 2,
+            draw(
+                c,
+                this.canvas,
+                state.width * this.x,
+                this.y * state.height,
                 birdSize,
-                birdSize
+                birdSize,
+                degrees
             );
         } else {
             c.fillStyle = 'blue';

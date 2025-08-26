@@ -1,8 +1,13 @@
+const OBSTICLE_SIZE = 70;
+const OBSTICLE_HOLE_SIZE = 180;
+const OBSTICLE_OFFSET_TOP = 40;
+const OBSTICLE_OFFSET_BOTTOM = 2;
+
 class Obstacle {
-    size = 50;
-    holeSize = 250;
-    offsetTop = 75;
-    offsetBottom = 75;
+    size = OBSTICLE_SIZE;
+    holeSize = OBSTICLE_HOLE_SIZE;
+    offsetTop = OBSTICLE_OFFSET_TOP;
+    offsetBottom = OBSTICLE_OFFSET_BOTTOM;
     x;
     y;
 
@@ -42,7 +47,11 @@ class Obstacle {
             const e1Pos = { x: e1.x * config.width, y: e1.y * config.height };
             const e2Pos = {
                 x: this.x * config.width,
-                y: (config.height - (this.offsetTop + this.offsetBottom)) * this.y + this.offsetTop,
+                y:
+                    (config.height - (this.offsetTop + this.offsetBottom + this.holeSize)) *
+                        this.y +
+                    this.offsetTop +
+                    this.holeSize / 2,
             };
 
             if (e1Pos.y < e2Pos.y - this.holeSize / 2 || e1Pos.y > e2Pos.y + this.holeSize / 2) {
@@ -79,14 +88,25 @@ class Obstacle {
         const holeSize = this.holeSize * state.scale;
         const offsetTop = this.offsetTop * state.scale;
         const offsetBottom = this.offsetBottom * state.scale;
-        const calculatedY = (state.height - (offsetTop + offsetBottom)) * this.y + offsetTop;
+        const calculatedY =
+            (state.height - (offsetTop + offsetBottom + holeSize)) * this.y +
+            offsetTop +
+            holeSize / 2;
 
-        if (this.collision()) {
-            c.fillStyle = 'blue';
-        } else {
-            c.fillStyle = 'red';
-        }
+        const gradientShaft = c.createLinearGradient(
+            state.width * this.x - obstacleWidth * 0.5,
+            0,
+            state.width * this.x + obstacleWidth * 0.5,
+            0
+        );
+        gradientShaft.addColorStop(0, '#8bb149');
+        gradientShaft.addColorStop(0.3, '#d6ef7f');
+        gradientShaft.addColorStop(1, '#567e20');
+        c.fillStyle = gradientShaft;
 
+        const lineWidth = 4 * state.scale;
+
+        //Shaft
         c.fillRect(
             state.width * this.x - obstacleWidth * 0.5,
             0,
@@ -101,6 +121,65 @@ class Obstacle {
             state.height - (calculatedY + offsetTop)
         );
 
-        c.fillRect(state.width * this.x - 5, calculatedY - 5, 10, 10);
+        c.strokeStyle = '#1f1b1d';
+        c.lineWidth = lineWidth;
+
+        c.strokeRect(
+            state.width * this.x - obstacleWidth * 0.5 + lineWidth / 2,
+            0 - lineWidth / 2,
+            obstacleWidth - lineWidth,
+            calculatedY - holeSize / 2
+        );
+
+        c.strokeRect(
+            state.width * this.x - obstacleWidth * 0.5 + lineWidth / 2,
+            calculatedY + holeSize / 2,
+            obstacleWidth - lineWidth,
+            state.height - (calculatedY + offsetTop)
+        );
+
+        const gradientHat = c.createLinearGradient(
+            state.width * this.x - obstacleWidth * 0.5,
+            0,
+            state.width * this.x + obstacleWidth * 0.5,
+            0
+        );
+        gradientHat.addColorStop(0, '#8bb149');
+        gradientHat.addColorStop(0.1, '#d6ef7f');
+        gradientHat.addColorStop(1, '#567e20');
+        c.fillStyle = gradientHat;
+
+        const capHeight = 36 * state.scale;
+
+        c.fillRect(
+            state.width * this.x - obstacleWidth * 0.5,
+            calculatedY - holeSize / 2 - capHeight,
+            obstacleWidth,
+            capHeight
+        );
+
+        c.fillRect(
+            state.width * this.x - obstacleWidth * 0.5,
+            calculatedY + holeSize / 2,
+            obstacleWidth,
+            capHeight
+        );
+
+        //Upper Tube Hat
+        c.strokeRect(
+            state.width * this.x - obstacleWidth * 0.5 - lineWidth / 2,
+            calculatedY - holeSize / 2 - capHeight,
+            obstacleWidth + lineWidth,
+            capHeight
+        );
+        //Lower Tube Hat
+        c.strokeRect(
+            state.width * this.x - obstacleWidth * 0.5 - lineWidth / 2,
+            calculatedY + holeSize / 2,
+            obstacleWidth + lineWidth,
+            capHeight
+        );
+
+        // c.fillRect(state.width * this.x - 5, calculatedY - 5, 10, 10);
     }
 }

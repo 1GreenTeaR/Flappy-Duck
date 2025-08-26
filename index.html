@@ -152,7 +152,10 @@
             }
 
             function render() {
-                c.fillStyle = '#70c5cd';
+                const gradient = c.createLinearGradient(0, 0, 0, c.canvas.height);
+                gradient.addColorStop(0, '#4bb3d2');
+                gradient.addColorStop(1, '#94cce2');
+                c.fillStyle = gradient;
                 c.fillRect(0, 0, c.canvas.width, c.canvas.height);
                 c.fillStyle = 'red';
 
@@ -193,10 +196,11 @@
                         if (
                             (state.updateData.ticks - state.levelData.startTick) %
                                 (state.updateData.ticksPerSecond * 4) ===
-                            0
+                                0 &&
+                            state.levelData.player.isAlive === true
                         ) {
                             state.levelData.tubes.push(
-                                new Obstacle(1 + 50 / config.width / 2, Math.random())
+                                new Obstacle(1 + OBSTICLE_SIZE / config.width / 2, Math.random())
                             );
                         }
                     }
