@@ -4,8 +4,10 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>FlappyDuck</title>
+        <script type="text/javascript" src="/ground.js"></script>
         <script type="text/javascript" src="/obstacle.js"></script>
         <script type="text/javascript" src="/player.js"></script>
+
         <style>
             html,
             body {
@@ -163,6 +165,9 @@
                     state.levelData.tubes.forEach((tube) => {
                         tube.render();
                     });
+
+                    state.levelData.ground.render();
+
                     state.levelData.player.render();
 
                     c.fillText('Points: ' + state.levelData.player.points, 10, 10);
@@ -238,6 +243,7 @@
                     tubes: [],
                     player: new Player(),
                     startTick: state.updateData.ticks,
+                    ground: new Ground(),
                 };
 
                 console.log('start');

@@ -1,7 +1,8 @@
 const OBSTICLE_SIZE = 70;
 const OBSTICLE_HOLE_SIZE = 180;
 const OBSTICLE_OFFSET_TOP = 40;
-const OBSTICLE_OFFSET_BOTTOM = 2;
+const CAP_HEIGHT = 36;
+const OBSTICLE_OFFSET_BOTTOM = GROUND_HEIGHT + CAP_HEIGHT + 10;
 
 class Obstacle {
     size = OBSTICLE_SIZE;
@@ -121,7 +122,7 @@ class Obstacle {
             state.height - (calculatedY + offsetTop)
         );
 
-        c.strokeStyle = '#1f1b1d';
+        c.strokeStyle = '#0c0c0c';
         c.lineWidth = lineWidth;
 
         c.strokeRect(
@@ -149,7 +150,7 @@ class Obstacle {
         gradientHat.addColorStop(1, '#567e20');
         c.fillStyle = gradientHat;
 
-        const capHeight = 36 * state.scale;
+        const capHeight = CAP_HEIGHT * state.scale;
 
         c.fillRect(
             state.width * this.x - obstacleWidth * 0.5,
