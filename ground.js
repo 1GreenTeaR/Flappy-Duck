@@ -1,9 +1,19 @@
 const GROUND_HEIGHT = 60;
 const LAND_HEIGHT = 10;
 const LINE_HEIGHT = 4;
+const BLANK_WIDTH = 14;
 
 class Ground {
+    offset = 0;
+
     constructor() {}
+
+    update() {
+        if (!state.levelData.player.isAlive) return;
+
+        this.offset += config.width * 0.0025;
+    }
+
     render() {
         const groundHeight = GROUND_HEIGHT * state.scale;
         c.fillStyle = '#ddd895';
@@ -40,19 +50,28 @@ class Ground {
         );
 
         const tiltOffset = 6 * state.scale;
-        const blankWidth = 14 * state.scale;
+        const blankWidth = BLANK_WIDTH * state.scale;
         const blankHeight = LAND_HEIGHT * state.scale;
         c.fillStyle = '#98e55b';
         c.beginPath();
 
         const startY = state.height - groundHeight + LINE_HEIGHT * state.scale;
-        let startX = 120;
-
+        let startX = 0 - (this.offset % (BLANK_WIDTH * 2)) * state.scale;
         c.moveTo(startX, startY);
         c.lineTo(startX - tiltOffset, startY + blankHeight);
         c.lineTo(startX - tiltOffset + blankWidth, startY + blankHeight);
         c.lineTo(startX + blankWidth, startY);
 
         c.fill();
+
+        for (startX; startX < state.width; startX += blankWidth * 2) {
+            c.beginPath();
+            c.moveTo(startX, startY);
+            c.lineTo(startX - tiltOffset, startY + blankHeight);
+            c.lineTo(startX - tiltOffset + blankWidth, startY + blankHeight);
+            c.lineTo(startX + blankWidth, startY);
+
+            c.fill();
+        }
     }
 }
