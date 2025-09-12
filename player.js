@@ -1,5 +1,7 @@
 class Player {
-    size;
+    // size;
+    width;
+    height;
     speed;
     x;
     y;
@@ -13,9 +15,11 @@ class Player {
 
     constructor() {
         this.speed = 0.0002;
-        this.size = 50;
+        // this.size = 50;
+        this.width = 120;
+        this.height = 40;
         this.y = 0.5;
-        this.x = 0.5 - this.size / config.width / 2;
+        this.x = 0.5 - this.width / config.width / 2;
 
         const image = fetch('assets/bird.png').then(async (data) => {
             let img = new Image();
@@ -23,8 +27,8 @@ class Player {
                 this.image = img;
 
                 const canvas = document.createElement('canvas');
-                canvas.width = this.size * 3;
-                canvas.height = this.size * 3;
+                canvas.width = this.width * 3;
+                canvas.height = this.height * 3;
                 const ctx = canvas.getContext('2d');
 
                 ctx.imageSmoothingEnabled = false;
@@ -40,8 +44,6 @@ class Player {
             };
             img.src = URL.createObjectURL(await data.blob());
         });
-
-        console.log(123);
     }
 
     update() {
@@ -53,8 +55,8 @@ class Player {
             }
         }
 
-        this.velocity += this.speed;
-        this.y += this.velocity;
+        this.velocity += this.speed * config.speed;
+        this.y += this.velocity * config.speed;
     }
 
     damage(amount) {
@@ -77,24 +79,42 @@ class Player {
             c.restore();
         }
 
-        const birdSize = this.size * state.scale;
-        if (this.canvas) {
+        const birdSize = { width: this.width * state.scale, height: this.height * state.scale };
+        // if (this.canvas) {
+        if (false) {
             c.imageSmoothingEnabled = false;
             draw(
                 c,
                 this.canvas,
                 state.width * this.x,
                 this.y * state.height,
-                birdSize,
-                birdSize,
+                birdSize.width,
+                birdSize.height,
                 degrees
             );
         } else {
-            c.fillStyle = 'blue';
+            c.fillStyle = collision ? 'red' : 'blue';
             c.beginPath();
 
-            c.arc(state.width * this.x, this.y * state.height, birdSize / 2, 0, 2 * Math.PI);
+            c.ellipse(
+                state.width * this.x,
+                this.y * state.height,
+                birdSize.width / 2,
+                birdSize.height / 2,
+                0,
+                0,
+                2 * Math.PI
+            );
             c.fill();
+
+            c.fillStyle = 'white';
+
+            c.fillRect(
+                state.width * this.x + data.x * state.scale - 5,
+                this.y * state.height - data.y * state.scale - 5,
+                10,
+                10
+            );
         }
     }
 }

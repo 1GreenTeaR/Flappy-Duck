@@ -96,7 +96,8 @@
                 width: 400,
                 height: 600,
                 scale: 1,
-                debug: false,
+                speed: 0.01,
+                debug: true,
             };
 
             const state = {
@@ -170,7 +171,11 @@
 
                     state.levelData.player.render();
 
-                    c.fillText('Points: ' + state.levelData.player.points, 10, 10);
+                    c.font = `${48 * state.scale}px Arial`;
+                    c.textAlign = 'center';
+                    c.textBaseline = 'middle';
+                    c.fillStyle = 'white';
+                    c.fillText(state.levelData.player.points, state.width / 2, state.height / 6);
                 }
             }
 
@@ -201,8 +206,8 @@
 
                         if (
                             (state.updateData.ticks - state.levelData.startTick) %
-                                (state.updateData.ticksPerSecond * 4) ===
-                                0 &&
+                                (state.updateData.ticksPerSecond * (4 / config.speed)) <
+                                1 &&
                             state.levelData.player.isAlive === true
                         ) {
                             state.levelData.tubes.push(
@@ -272,7 +277,6 @@
                 canvas.addEventListener('mousemove', (e) => {
                     state.debug.x = e.clientX;
                     state.debug.y = e.clientY;
-                    console.log(e);
                 });
             }
 

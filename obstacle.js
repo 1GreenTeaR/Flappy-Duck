@@ -3,6 +3,10 @@ const OBSTICLE_HOLE_SIZE = 180;
 const OBSTICLE_OFFSET_TOP = 40;
 const CAP_HEIGHT = 36;
 const OBSTICLE_OFFSET_BOTTOM = GROUND_HEIGHT + CAP_HEIGHT + 10;
+const OBSTICLE_SPEED = 0.0025;
+
+let collision = false;
+let data = {};
 
 class Obstacle {
     size = OBSTICLE_SIZE;
@@ -19,8 +23,9 @@ class Obstacle {
     }
 
     update() {
+        collision = false;
         if (state.levelData.player.isAlive === false) return;
-        this.x -= 0.0025;
+        this.x -= config.speed * OBSTICLE_SPEED;
         if (this.collision()) {
             // state.levelData.player.isAlive = false;
             state.levelData.player.damage(1);
@@ -44,7 +49,7 @@ class Obstacle {
 
         const distanceX = Math.abs(e1.x - e2.x) * config.width;
 
-        if (distanceX < e1.size / 2 + e2.size / 2) {
+        if (distanceX < e1.width / 2 + e2.size / 2) {
             const e1Pos = { x: e1.x * config.width, y: e1.y * config.height };
             const e2Pos = {
                 x: this.x * config.width,
@@ -67,8 +72,33 @@ class Obstacle {
             ];
 
             for (let i = 0; i < points.length; i++) {
+                const distance =
+                    ((points[i].x - e1Pos.x) ** 2 + (points[i].y - e1Pos.y) ** 2) ** 0.5;
+                const angle = Math.atan2(
+                    (points[i].y - e1Pos.y) * (e1.width / e1.height),
+                    points[i].x - e1Pos.x
+                );
+
+                // const yRatio = 1 - Math.abs(Math.PI / 2 - Math.abs(angle)) / (Math.PI / 2);
+                // const xRatio = 1 - yRatio;
+
+                const yRatio = Math.abs(Math.sin(angle));
+                const xRatio = Math.abs(Math.cos(angle));
+
+                data = { x: (xRatio * e1.width) / 2, y: (yRatio * e1.height) / 2 };
+
+                const radius =
+                    (((e1.width / 2) * xRatio) ** 2 + ((e1.height / 2) * yRatio) ** 2) ** 0.5;
+
+                console.log(distance, angle, radius);
+                if (radius >= distance) {
+                    collision = true;
+                } else {
+                    collision = false;
+                }
+
                 if (
-                    state.levelData.player.size / 2 >
+                    state.levelData.player.height / 2 >
                     ((points[i].x - e1Pos.x) ** 2 + (points[i].y - e1Pos.y) ** 2) ** 0.5
                 ) {
                     return true;
