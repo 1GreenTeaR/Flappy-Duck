@@ -5,9 +5,6 @@ const CAP_HEIGHT = 36;
 const OBSTICLE_OFFSET_BOTTOM = GROUND_HEIGHT + CAP_HEIGHT + 10;
 const OBSTICLE_SPEED = 0.0025;
 
-let collision = false;
-let data = {};
-
 class Obstacle {
     size = OBSTICLE_SIZE;
     holeSize = OBSTICLE_HOLE_SIZE;
@@ -23,7 +20,6 @@ class Obstacle {
     }
 
     update() {
-        collision = false;
         if (state.levelData.player.isAlive === false) return;
         this.x -= config.speed * OBSTICLE_SPEED;
         if (this.collision()) {
@@ -36,7 +32,7 @@ class Obstacle {
 
         if (
             !this.isPassed &&
-            e1.x * config.width > e2.x * config.width + this.size / 2 + e1.size / 2
+            e1.x * config.width > e2.x * config.width + this.size / 2 + e1.width / 2
         ) {
             e1.points++;
             this.isPassed = true;
@@ -85,29 +81,23 @@ class Obstacle {
                 const yRatio = Math.abs(Math.sin(angle));
                 const xRatio = Math.abs(Math.cos(angle));
 
-                data = { x: (xRatio * e1.width) / 2, y: (yRatio * e1.height) / 2 };
-
                 const radius =
                     (((e1.width / 2) * xRatio) ** 2 + ((e1.height / 2) * yRatio) ** 2) ** 0.5;
 
                 console.log(distance, angle, radius);
-                if (radius >= distance) {
-                    collision = true;
-                } else {
-                    collision = false;
-                }
+                if (radius >= distance) return true;
 
-                if (
-                    state.levelData.player.height / 2 >
-                    ((points[i].x - e1Pos.x) ** 2 + (points[i].y - e1Pos.y) ** 2) ** 0.5
-                ) {
-                    return true;
-                }
+                // if (
+                //     state.levelData.player.height / 2 >
+                //     ((points[i].x - e1Pos.x) ** 2 + (points[i].y - e1Pos.y) ** 2) ** 0.5
+                // ) {
+                //     return true;
+                // }
             }
 
             if (distanceX < e2.size / 2) {
-                if (e2Pos.y - this.holeSize / 2 + e1.size / 2 > e1Pos.y) return true;
-                if (e2Pos.y + this.holeSize / 2 - e1.size / 2 < e1Pos.y) return true;
+                if (e2Pos.y - this.holeSize / 2 + e1.height / 2 > e1Pos.y) return true;
+                if (e2Pos.y + this.holeSize / 2 - e1.height / 2 < e1Pos.y) return true;
             }
         }
 

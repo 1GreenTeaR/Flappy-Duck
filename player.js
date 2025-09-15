@@ -16,8 +16,8 @@ class Player {
     constructor() {
         this.speed = 0.0002;
         // this.size = 50;
-        this.width = 120;
-        this.height = 40;
+        this.width = 50;
+        this.height = 35;
         this.y = 0.5;
         this.x = 0.5 - this.width / config.width / 2;
 
@@ -57,6 +57,17 @@ class Player {
 
         this.velocity += this.speed * config.speed;
         this.y += this.velocity * config.speed;
+
+        const y = this.y * config.height;
+        if (y + this.height / 2 >= config.height - GROUND_HEIGHT) {
+            this.damage(1);
+            this.y = (config.height - GROUND_HEIGHT - this.height / 2) / config.height;
+            this.velocity = -this.velocity;
+        }
+
+        if (!this.isAlive && this.velocity < 0) {
+            this.velocity *= 0.95;
+        }
     }
 
     damage(amount) {
@@ -80,8 +91,7 @@ class Player {
         }
 
         const birdSize = { width: this.width * state.scale, height: this.height * state.scale };
-        // if (this.canvas) {
-        if (false) {
+        if (this.canvas) {
             c.imageSmoothingEnabled = false;
             draw(
                 c,
@@ -93,7 +103,7 @@ class Player {
                 degrees
             );
         } else {
-            c.fillStyle = collision ? 'red' : 'blue';
+            c.fillStyle = 'blue';
             c.beginPath();
 
             c.ellipse(
@@ -106,15 +116,6 @@ class Player {
                 2 * Math.PI
             );
             c.fill();
-
-            c.fillStyle = 'white';
-
-            c.fillRect(
-                state.width * this.x + data.x * state.scale - 5,
-                this.y * state.height - data.y * state.scale - 5,
-                10,
-                10
-            );
         }
     }
 }

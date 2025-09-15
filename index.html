@@ -7,6 +7,8 @@
         <script type="text/javascript" src="/ground.js"></script>
         <script type="text/javascript" src="/obstacle.js"></script>
         <script type="text/javascript" src="/player.js"></script>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Tiny5&display=swap" rel="stylesheet" />
 
         <style>
             html,
@@ -51,15 +53,58 @@
             }
 
             .end-game-container {
-                background-color: gray;
-                padding: 20px;
-                border-radius: 20px;
+                background-color: #ded895;
+                padding: 6px;
+                flex-direction: column;
+                align-items: center;
+                min-width: 120px;
+                min-height: 140px;
 
                 position: absolute;
                 top: 50%;
                 left: 50%;
 
                 transform: translate(-50%, -50%);
+                outline: 4px solid #543847;
+                user-select: none;
+
+                font-family: 'Tiny5', monospace;
+            }
+
+            .end-game {
+                min-width: 118px;
+                min-height: 138px;
+                border-top: 4px solid #bfa651;
+                border-left: 4px solid #bfa651;
+                border-bottom: 4px solid #f3ec9e;
+                border-right: 4px solid #f3ec9e;
+                align-items: center;
+                justify-content: center;
+                display: flex;
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            .end-game-text {
+                font-size: 24px;
+                color: #bfa651;
+                text-shadow: 1px 1px 2px #f3ec9e;
+            }
+
+            #end-game-score,
+            #end-game-best-score {
+                display: block;
+                position: relative;
+                font-size: 46px;
+                font-weight: bold;
+                color: #ffffff;
+                text-align: center;
+                line-height: 1;
+                margin: 0;
+                filter: drop-shadow(-4px 0 0 #000) drop-shadow(4px 0 0 #000)
+                    drop-shadow(0 -4px 0 #000) drop-shadow(0 4px 0 #000);
+                /* letter-spacing: 2px; */
+                padding-bottom: 8px;
             }
 
             #end-game-container {
@@ -69,6 +114,24 @@
             #end-game-congrats {
                 display: none;
             }
+
+            button {
+                font-family: 'Tiny5', monospace;
+                border-radius: 0;
+                outline: 3px solid #543847;
+                border: 3px solid #fcf7e7;
+                background-color: #dd5f2d;
+                color: #fcf7e7;
+                padding: 8px;
+                font-size: 20px;
+                font-weight: bold;
+                transition: transform 0.1s, filter 0.1s;
+                margin-top: 8px;
+            }
+            button:active {
+                filter: brightness(0.9);
+                transform: scale(0.95) translateY(2px);
+            }
         </style>
     </head>
 
@@ -76,16 +139,19 @@
         <div class="game-container">
             <canvas id="canvas"></canvas>
             <div id="end-game-container" class="end-game-container">
-                <div>Game Over</div>
-                <div id="end-game-congrats">New Highscore!</div>
-                <div id="end-game-best-score">-</div>
-                <div id="end-game-score">-</div>
-                <button onclick="start()">Restart</button>
+                <div class="end-game">
+                    <div id="end-game-congrats">NEW HIGHSCORE!</div>
+                    <div class="end-game-text">SCORE</div>
+                    <div id="end-game-best-score">-</div>
+                    <div class="end-game-text">BEST</div>
+                    <div id="end-game-score">-</div>
+                    <button onclick="start()">RESTART</button>
+                </div>
             </div>
         </div>
-        <div class="dev-panel">
+        <!-- <div class="dev-panel">
             <div class="dev-button" tabindex="-1" onclick="start()">restart</div>
-        </div>
+        </div> -->
 
         <script>
             const canvas = document.getElementById('canvas');
@@ -96,8 +162,8 @@
                 width: 400,
                 height: 600,
                 scale: 1,
-                speed: 0.01,
-                debug: true,
+                speed: 1,
+                debug: false,
             };
 
             const state = {
@@ -156,8 +222,8 @@
 
             function render() {
                 const gradient = c.createLinearGradient(0, 0, 0, c.canvas.height);
-                gradient.addColorStop(0, '#4bb3d2');
-                gradient.addColorStop(1, '#94cce2');
+                gradient.addColorStop(0, '#319fd6');
+                gradient.addColorStop(1, '#67b5db');
                 c.fillStyle = gradient;
                 c.fillRect(0, 0, c.canvas.width, c.canvas.height);
                 c.fillStyle = 'red';
@@ -171,10 +237,13 @@
 
                     state.levelData.player.render();
 
-                    c.font = `${48 * state.scale}px Arial`;
+                    c.font = `${48 * state.scale}px "Tiny5", monospace`;
                     c.textAlign = 'center';
                     c.textBaseline = 'middle';
                     c.fillStyle = 'white';
+                    c.strokeStyle = 'black';
+                    c.lineWidth = 6 * state.scale;
+                    c.strokeText(state.levelData.player.points, state.width / 2, state.height / 6);
                     c.fillText(state.levelData.player.points, state.width / 2, state.height / 6);
                 }
             }
@@ -225,13 +294,13 @@
                 const endGameScore = document.getElementById('end-game-score');
                 const endGameBestScore = document.getElementById('end-game-best-score');
                 const endGameCongrats = document.getElementById('end-game-congrats');
-                endGameContainerElement.style.display = 'block';
+                endGameContainerElement.style.display = 'flex';
                 endGameScore.innerHTML = state.levelData.player.points;
 
                 if (bestScore < state.levelData.player.points) {
                     bestScore = state.levelData.player.points;
                     localStorage.setItem('best-score', bestScore);
-                    endGameCongrats.style.display = 'block';
+                    endGameCongrats.style.display = 'flex';
                 } else endGameCongrats.style.display = 'none';
                 endGameBestScore.innerHTML = bestScore;
             }
