@@ -4,7 +4,7 @@
 
 +- Game loop
 +- Input detection
-+- Bird flaying
++- Bird flying
 +- Obstacles logic
 +- World scrolling
 
@@ -14,16 +14,11 @@
 +- Score
 
 +- End screen
-+- Leaderboard
 
 ## Visuals & Sound
 
 +- Assets
 
--   Bird rotation
--   Background scrolling
--   Clouds
--   HUD
--   Sound effects
--   Vibration
--   Experiment ???
++- Bird rotation
++- Background scrolling
++- HUD
